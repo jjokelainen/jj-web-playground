@@ -1,0 +1,11 @@
+body {
+  background-color: #1a202c;
+}
+
+section {
+  background-color: white;
+  padding: 10px 10px;
+  width: 800px;
+  margin: 0 auto 0 auto;
+  border-radius: 1em;
+}
