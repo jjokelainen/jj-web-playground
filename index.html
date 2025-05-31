@@ -1,132 +1,83 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>#000000</title>
-    <link type="image/x-icon" rel="shortcut icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAHklEQVQ4T2NkYGD4z0ABYBw1gGE0DBhGw4BhWIQBAE5OEAELnjVHAAAAAElFTkSuQmCC">
-    <style>
-        :root {
-            --color: #000000;
-            --color-transparent: #00000022;
-        }
-
-        ::selection {
-            background: var(--color-transparent);
-        }
-
-        html,
+    <title>Luhn algorithm</title>
+    <style type="text/css">
         body {
-            background: var(--color);
-            height: 100%;
-            margin: 0;
+            background-color: #1a202c;
         }
 
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        #color {
-            background: white;
-            color: var(--color);
-            font-size: 2.5rem;
-            font-weight: 300;
-            padding: 2.25rem 3rem;
-            font-family: -apple-system, BlinkMacSystemFont, avenir next, avenir, helvetica neue, helvetica, ubuntu, roboto, noto, segoe ui, arial, sans-serif;
-            cursor: text;
+        section {
+            background-color: white;
+            padding: 10px 10px;
+            width: 800px;
+            margin: 0 auto 0 auto;
+            border-radius: 1em;
         }
     </style>
+    <title>Luhn algorithm by JJokelainen</title>
 </head>
 
 <body>
-    <p id="color">#000000</p>
+    <section>
+        <h1>Checksum tool - Luhn algorithm</h1>
+        <p>Simple Luhn algorithm calculator/checker.<br />
+            I take no responsibility for the validity of the results.<br />
+        <h2>Usage</h2>
+        Calculate the check number by providing the number sequence and press Calculate check number.<br />
+        Checknumber will be provided as a result.<br />
+        To check if number sequence is valid, input the numbersequence including the check number and press "Verify
+        validity"<br />
+
+        </p>
+        <input type="text" id="data" /><br>
+        <button onclick="calculate_check_number()">Calculate check number</button><br>
+        <button onclick="verify_validity()">Verify validity</button><br>
+
+        <div id="result"></div>
+
+    </section>
     <script>
-        function randomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1) + min);
+        /*Do not include check number*/
+        function calculate_sum(data) {
+            let double = true;
+            let sum = 0;
+            for (let i = data.length - 1; i >= 0; i--) {
+                let value = parseInt(data[i]);
+                if (double) {
+                    value *= 2;
+                    if (value > 9) {
+                        value -= 9;
+                    }
+                }
+                double = !double;
+                sum += value;
+            }
+            return sum;
         }
 
-        function hslToHex(h, s, l) {
-            h /= 360;
-            s /= 100;
-            l /= 100;
-            var r = void 0,
-                g = void 0,
-                b = void 0;
-            if (s === 0) {
-                r = g = b = l; // achromatic
+        const result = document.getElementById("result");
+
+        function calculate_check_number() {
+            const data = document.getElementById("data").value;
+            const sum = calculate_sum(data);
+            const mod = (10 - (sum % 10)) % 10;
+            result.innerHTML = "Check number is " + mod;
+        }
+
+        function verify_validity() {
+            const data = document.getElementById("data").value;
+            const without_check = data.slice(0, -1);
+            const sum = calculate_sum(without_check) + parseInt(data[data.length - 1]);
+            const mod = 10 - (sum % 10);
+            if (mod != 10) {
+                result.innerHTML = "Invalid";
             } else {
-                var hue2rgb = function hue2rgb(p, q, t) {
-                    if (t < 0) t += 1;
-                    if (t > 1) t -= 1;
-                    if (t < 1 / 6) return p + (q - p) * 6 * t;
-                    if (t < 1 / 2) return q;
-                    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
-                    return p;
-                };
-                var q = l < 0.5 ? l * (1 + s) : l + s - l * s;
-                var p = 2 * l - q;
-                r = hue2rgb(p, q, h + 1 / 3);
-                g = hue2rgb(p, q, h);
-                b = hue2rgb(p, q, h - 1 / 3);
+                result.innerHTML = "Valid";
             }
-            var toHex = function toHex(x) {
-                var hex = Math.round(x * 255).toString(16);
-                return hex.length === 1 ? '0' + hex : hex;
-            };
-            return '#' + toHex(r) + toHex(g) + toHex(b);
         }
 
-        window.onload = function () {
-            let stopProp = function (ev) {
-                ev.stopPropagation();
-            }
-
-            var colorElement = document.getElementById("color");
-            colorElement.addEventListener("click", stopProp, false);
-            colorElement.addEventListener("mousedown", stopProp, false);
-
-            var setFavicon = function (hex) {
-                var canvas = document.createElement('canvas');
-                canvas.width = 16;
-                canvas.height = 16;
-                var ctx = canvas.getContext('2d');
-                ctx.fillStyle = hex;
-                ctx.fillRect(0, 0, 16, 16);
-                document.getElementsByTagName('link')[0].href = canvas.toDataURL("image/x-icon");
-            }
-
-            var setRandomColor = function setRandomColor() {
-                var h = void 0,
-                    s = void 0,
-                    l = void 0;
-
-                h = randomInt(0, 359);
-                s = randomInt(55, 75);
-                l = randomInt(40, 60);
-
-                document.documentElement.style.setProperty('--color', 'hsl(' + h + ', ' + s + '%, ' + l + '%)');
-                var hex = hslToHex(h, s, l);
-                document.title = hex;
-                colorElement.innerHTML = hex;
-                document.documentElement.style.setProperty('--color-transparent', hex + '22');
-
-                setFavicon(hex);
-            };
-            setRandomColor();
-
-            var body = document.getElementsByTagName("body")[0];
-            body.addEventListener("mousedown", function (ev) {
-                ev.preventDefault();
-            });
-            body.addEventListener("click", function () {
-                setRandomColor();
-            }, false);
-        };
     </script>
 </body>
 
